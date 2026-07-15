@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension format="1.0">
+
+    <extension_code>nginx-cmdb</extension_code>
+
+    <company><![CDATA[中联惠捷]]></company>
+
+    <author><![CDATA[JXIN]]></author>
+
+    <label><![CDATA[Nginx CMDB]]></label>
+
+    <description><![CDATA[
+        Nginx configuration data model
+    ]]></description>
+
+    <version>1.0.1</version>
+
+
+    <modules type="array">
+        <module>
+            <id>nginx-cmdb</id>
+            <version>1.0.1</version>
+        </module>
+    </modules>
+
+
+    <itop_version_min>3.2.0</itop_version_min>
+
+</extension>

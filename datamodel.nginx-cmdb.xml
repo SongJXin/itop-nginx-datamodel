@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<itop_design
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    version="1.6">
+    <classes>
+        <class id="Software" _delta="must_exist">
+            <fields>
+                <field id="type" xsi:type="AttributeEnum" _delta="redefine">
+                    <sort_type>label</sort_type>
+                    <values>
+                        <value id="Middleware">
+                            <code>Middleware</code>
+                        </value>
+                        <value id="DBServer">
+                            <code>DBServer</code>
+                        </value>
+                        <value id="PCSoftware">
+                            <code>PCSoftware</code>
+                        </value>
+                        <value id="OtherSoftware">
+                            <code>OtherSoftware</code>
+                        </value>
+                        <value id="WebServer">
+                            <code>WebServer</code>
+                        </value>
+                        <value id="NginxInstance">
+                            <code>NginxInstance</code>
+                        </value>
+                    </values>
+                    <sql>type</sql>
+                    <default_value />
+                    <is_null_allowed>true</is_null_allowed>
+                    <display_style>list</display_style>
+                </field>
+            </fields>
+        </class>
+        <!-- ==========================
+        Nginx Instance
+        =========================== -->
+        <class id="NginxInstance" _delta="define">
+            <parent>SoftwareInstance</parent>
+            <properties>
+                <category>bizmodel,configmgmt</category>
+                <abstract>false</abstract>
+                <key_type>autoincrement</key_type>
+                <db_table>nginxinstance</db_table>
+                <db_key_field>id</db_key_field>
+                <db_final_class_field />
+                <naming>
+                    <attributes>
+                        <attribute id="name" />
+                    </attributes>
+                </naming>
+            </properties>
+            <fields>
+
+                <field id="version" xsi:type="AttributeString">
+                    <sql>version</sql>
+                    <is_null_allowed>true</is_null_allowed>
+                </field>
+                <field id="config_file" xsi:type="AttributeString">
+                    <sql>config_file</sql>
+                    <is_null_allowed>true</is_null_allowed>
+                </field>
+                <!-- Linked Set for Servers block -->
+                <field id="servers" xsi:type="AttributeLinkedSet">
+                    <linked_class>NginxServerBlock</linked_class>
+
+                    <ext_key_to_me>instance_id</ext_key_to_me>
+
+
+                    <count_min>0</count_min>
+                    <count_max>0</count_max> <!-- 0 = 无限制 -->
+                    <zlist>true</zlist>
+                    <duplicates>false</duplicates>
+                </field>
+            </fields>
+            <methods />
+            <presentation>
+                <details>
+                    <items>
+                        <item id="name" />
+                        <item id="org_id" />
+                        <item id="servers" />
+                        <item id="version" />
+                        <item id="config_file" />
+                        <item id="software_id" />
+                        <item id="system_id" />
+                    </items>
+                </details>
+                <list>
+                    <items>
+                        <item id="name" />
+                        <item id="servers" />
+                        <item id="version" />
+                        <item id="config_file" />
+                        <item id="software_id" />
+                        <item id="system_id" />
+                    </items>
+                </list>
+            </presentation>
+        </class>
+        <!-- ==========================
+ Nginx Server Block
+ server {}
+=========================== -->
+        <class id="NginxServerBlock" _delta="define">
+            <parent>cmdbAbstractObject</parent>
+            <properties>
+                <category>bizmodel,configmgmt</category>
+                <abstract>false</abstract>
+                <key_type>autoincrement</key_type>
+                <db_table>nginxserverblock</db_table>
+                <db_key_field>id</db_key_field>
+                <db_final_class_field />
+            </properties>
+            <fields>
+                <field id="instance_id" xsi:type="AttributeExternalKey">
+                    <sql>instance_id</sql>
+                    <target_class>NginxInstance</target_class>
+                    <is_null_allowed>false</is_null_allowed>
+                    <on_target_delete>DEL_AUTO</on_target_delete>
+                </field>
+
+                <field id="locations" xsi:type="AttributeLinkedSet">
+                    <linked_class>NginxLocation</linked_class>
+                    <ext_key_to_me>server_id</ext_key_to_me>
+                    <ext_key_to_remote>proxy_pass</ext_key_to_remote>
+                    <count_min>0</count_min>
+                    <count_max>0</count_max> <!-- 0 = 无限制 -->
+                    <zlist>true</zlist>
+                    <duplicates>false</duplicates>
+                </field>
+                <field id="name" xsi:type="AttributeString">
+                    <sql>name</sql>
+                    <is_null_allowed>false</is_null_allowed>
+                </field>
+                <field id="listen" xsi:type="AttributeString">
+                    <sql>listen</sql>
+                    <is_null_allowed>true</is_null_allowed>
+                </field>
+                <field id="ssl" xsi:type="AttributeBoolean">
+                    <sql>ssl</sql>
+                    <default_value>false</default_value>
+                </field>
+            </fields>
+            <methods />
+            <presentation>
+                <details>
+                    <items>
+                        <item id="name" />
+                        <item id="listen" />
+                        <item id="ssl" />
+                        <item id="instance_id" />
+                        <item id="locations" />
+                    </items>
+                </details>
+                <list>
+                    <items>
+                        <item id="name" />
+                        <item id="listen" />
+                        <item id="ssl" />
+                        <item id="locations" />
+                    </items>
+                </list>
+            </presentation>
+        </class>
+        <!-- ==========================
+ Nginx Location
+=========================== -->
+        <class id="NginxLocation" _delta="define">
+            <parent>cmdbAbstractObject</parent>
+            <properties>
+                <category>bizmodel,configmgmt</category>
+                <abstract>false</abstract>
+                <key_type>autoincrement</key_type>
+                <db_table>nginxlocation</db_table>
+                <db_key_field>id</db_key_field>
+                <db_final_class_field />
+            </properties>
+            <fields>
+                <field id="server_id" xsi:type="AttributeExternalKey">
+                    <sql>server_id</sql>
+                    <target_class>NginxServerBlock</target_class>
+                    <is_null_allowed>false</is_null_allowed>
+                    <on_target_delete>DEL_AUTO</on_target_delete>
+                </field>
+
+                <field id="uri" xsi:type="AttributeString">
+                    <sql>uri</sql>
+                    <is_null_allowed>false</is_null_allowed>
+                </field>
+                <field id="proxy_pass" xsi:type="AttributeExternalKey">
+                    <sql>proxy_pass</sql>
+                    <target_class>FunctionalCI</target_class>
+                    <is_null_allowed>true</is_null_allowed>
+                    <on_target_delete>DEL_AUTO</on_target_delete>
+                </field>
+                <field id="proxy_pass_name" xsi:type="AttributeExternalField">
+                    <extkey_attcode>proxy_pass</extkey_attcode>
+                    <target_attcode>name</target_attcode>
+                </field>
+                <field id="root" xsi:type="AttributeString">
+                    <sql>root</sql>
+                    <is_null_allowed>true</is_null_allowed>
+                </field>
+
+            </fields>
+            <methods />
+            <presentation>
+                <details>
+                    <items>
+                        <item id="uri" />
+                        <item id="server_id" />
+                        <item id="proxy_pass" />
+                        <item id="proxy_pass_name" />
+                        <item id="root" />
+
+                    </items>
+                </details>
+                <list>
+                    <items>
+                        <item id="uri" />
+                        <item id="proxy_pass_name" />
+                        <item id="root" />
+
+                    </items>
+                </list>
+            </presentation>
+        </class>
+        <!-- ==========================
+        Nginx Upstream
+        =========================== -->
+        <class id="NginxUpstreamServer" _delta="define">
+            <parent>cmdbAbstractObject</parent>
+            <properties>
+                <category>bizmodel,configmgmt</category>
+                <abstract>false</abstract>
+                <key_type>autoincrement</key_type>
+                <db_table>nginxupstream_server</db_table>
+                <db_key_field>id</db_key_field>
+                <db_final_class_field>finalclass</db_final_class_field>
+            </properties>
+
+            <fields>
+                <field id="upstream_id" xsi:type="AttributeExternalKey">
+                    <sql>upstream_id</sql>
+                    <target_class>NginxUpstream</target_class>
+                    <is_null_allowed>false</is_null_allowed>
+                    <on_target_delete>DEL_AUTO</on_target_delete>
+                </field>
+
+                <field id="server_id" xsi:type="AttributeExternalKey">
+                    <sql>server_id</sql>
+                    <target_class>FunctionalCI</target_class>
+                    <is_null_allowed>false</is_null_allowed>
+                    <on_target_delete>DEL_AUTO</on_target_delete>
+                </field>
+
+                <!-- 可选：权重 / 端口 / backup -->
+                <field id="weight" xsi:type="AttributeInteger">
+                    <sql>weight</sql>
+                    <is_null_allowed>true</is_null_allowed>
+                </field>
+                <field id="port" xsi:type="AttributeInteger">
+                    <sql>port</sql>
+                    <is_null_allowed>false</is_null_allowed>
+                </field>
+                <field id="server_name" xsi:type="AttributeExternalField">
+                    <extkey_attcode>server_id</extkey_attcode>
+                    <target_attcode>name</target_attcode>
+                </field>
+            </fields>
+            <methods />
+            <presentation>
+                <details>
+                    <items>
+                        <item id="server_id" />
+                        <item id="server_name" />
+                        <item id="weight" />
+                        <item id="port" />
+                    </items>
+                </details>
+            </presentation>
+        </class>
+        <class id="NginxUpstream" _delta="define">
+            <parent>cmdbAbstractObject</parent>
+            <properties>
+                <category>bizmodel,configmgmt</category>
+                <abstract>false</abstract>
+                <key_type>autoincrement</key_type>
+                <db_table>nginxupstream</db_table>
+                <db_key_field>id</db_key_field>
+                <db_final_class_field />
+            </properties>
+
+            <fields>
+                <field id="name" xsi:type="AttributeString">
+                    <sql>name</sql>
+                    <is_null_allowed>false</is_null_allowed>
+                </field>
+                <field id="algorithm" xsi:type="AttributeString">
+                    <sql>algorithm</sql>
+                    <is_null_allowed>true</is_null_allowed>
+                </field>
+                <field id="servers" xsi:type="AttributeLinkedSetIndirect">
+                    <linked_class>NginxUpstreamServer</linked_class>
+                    <ext_key_to_me>upstream_id</ext_key_to_me>
+
+                    <ext_key_to_remote>server_id</ext_key_to_remote>
+
+                    <count_min>1</count_min>
+                    <count_max>0</count_max> <!-- 0 = 无限制 -->
+                    <zlist>true</zlist>
+                    <duplicates>false</duplicates>
+                </field>
+            </fields>
+            <methods />
+            <presentation>
+                <details>
+                    <items>
+                        <item id="name" />
+                        <item id="algorithm" />
+                        <item id="servers" />
+                    </items>
+                </details>
+                <list>
+                    <items>
+                        <item id="name" />
+                        <item id="algorithm" />
+                    </items>
+                </list>
+            </presentation>
+        </class>
+    </classes>
+
+</itop_design>
