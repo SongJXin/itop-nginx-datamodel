@@ -43,6 +43,7 @@
                 <field id="description" xsi:type="AttributeText">
                     <label>Description</label>
                     <sql>description</sql>
+                    <is_null_allowed>true</is_null_allowed>
                 </field>
             </fields>
 
