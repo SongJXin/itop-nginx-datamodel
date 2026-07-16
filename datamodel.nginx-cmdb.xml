@@ -3,6 +3,143 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     version="1.6">
     <classes>
+        <class id="SoftwarePort" _delta="define">
+            <parent>cmdbAbstractObject</parent>
+            <properties>
+                <category>bizmodel</category>
+                <name>Software Port</name>
+                <plural>Software Ports</plural>
+                <db_table>softwareport</db_table>
+                <db_key_field>id</db_key_field>
+                <db_final_class_field />
+                <style>
+                <icon>./images/software_port.svg</icon>
+                </style>
+            </properties>
+
+            <fields>
+                <field id="software_instance_id" xsi:type="AttributeExternalKey">
+                    <sql>software_instance_id</sql>
+                    <target_class>SoftwareInstance</target_class>
+                    <label>Software Instance</label>
+                    <is_null_allowed>false</is_null_allowed>
+                </field>
+
+                <field id="port_number" xsi:type="AttributeInteger">
+                    <label>Port Number</label>
+                    <sql>port_number</sql>
+                    <default_value>0</default_value>
+                </field>
+
+                <field id="protocol" xsi:type="AttributeEnum">
+                    <sql>protocol</sql>
+                    <label>Protocol</label>
+                    <values>
+                        <value>tcp</value>
+                        <value>udp</value>
+                    </values>
+                    <default_value>tcp</default_value>
+                </field>
+
+            </fields>
+
+            <methods />
+            <presentation>
+                <details>
+                    <items>
+                        <item id="software_instance_id" />
+                        <item id="port_number" />
+                        <item id="protocol" />
+                    </items>
+                </details>
+                <list>
+                    <items>
+                        <item id="software_instance_id" />
+                        <item id="port_number" />
+                        <item id="protocol" />
+                    </items>
+                </list>
+            </presentation>
+        </class>
+        <class id="SoftwareInstance" _delta="must_exist">
+            <fields>
+                <field id="ports" xsi:type="AttributeLinkedSet" _delta="define">
+                    <linked_class>SoftwarePort</linked_class>
+                    <ext_key_to_me>software_instance_id</ext_key_to_me>
+                    <count_min>0</count_min>
+                    <count_max>0</count_max>
+                    <zlist>true</zlist>
+                    <duplicates>false</duplicates>
+                </field>
+            </fields>
+            <relations>
+                <relation id="impacts" _delta="merge">
+                    <neighbours>
+                        <neighbour id="ports">
+                            <attribute>ports</attribute>
+                            <direction>both</direction>
+                        </neighbour>
+                    </neighbours>
+                </relation>
+            </relations>
+            <presentation>
+                <details>
+                    <items>
+                        <item id="ports" _delta="define" />
+                    </items>
+                </details>
+                <list>
+                    <items>
+                        <item id="ports" _delta="define" />
+                    </items>
+                </list>
+            </presentation>
+        </class>
+        <class id="DBServer" _delta="must_exist">
+            <presentation _delta="merge">
+                <details>
+                    <items>
+                        <item id="ports" />
+                    </items>
+                </details>
+            </presentation>
+        </class>
+        <class id="Middleware" _delta="must_exist">
+            <presentation _delta="merge">
+                <details>
+                    <items>
+                        <item id="ports" />
+                    </items>
+                </details>
+            </presentation>
+        </class>
+        <class id="PCSoftware" _delta="must_exist">
+            <presentation _delta="merge">
+                <details>
+                    <items>
+                        <item id="ports" />
+                    </items>
+                </details>
+            </presentation>
+        </class>
+        <class id="OtherSoftware" _delta="must_exist">
+            <presentation _delta="merge">
+                <details>
+                    <items>
+                        <item id="ports" />
+                    </items>
+                </details>
+            </presentation>
+        </class>
+        <class id="WebServer" _delta="must_exist">
+            <presentation _delta="merge">
+                <details>
+                    <items>
+                        <item id="ports" />
+                    </items>
+                </details>
+            </presentation>
+        </class>
         <class id="Software" _delta="must_exist">
             <fields>
                 <field id="type" xsi:type="AttributeEnum" _delta="redefine">
@@ -40,6 +177,9 @@
         <class id="NginxInstance" _delta="define">
             <parent>SoftwareInstance</parent>
             <properties>
+                <style>
+                <icon>./images/nginx_instance.svg</icon>
+                </style>
                 <category>bizmodel,configmgmt</category>
                 <abstract>false</abstract>
                 <key_type>autoincrement</key_type>
@@ -51,6 +191,7 @@
                         <attribute id="name" />
                     </attributes>
                 </naming>
+
             </properties>
             <fields>
 
@@ -75,6 +216,16 @@
                     <duplicates>false</duplicates>
                 </field>
             </fields>
+            <relations>
+                <relation id="impacts">
+                    <neighbours>
+                        <neighbour id="servers">
+                            <attribute>servers</attribute>
+                            <direction>both</direction>
+                        </neighbour>
+                    </neighbours>
+                </relation>
+            </relations>
             <methods />
             <presentation>
                 <details>
@@ -107,12 +258,20 @@
         <class id="NginxServerBlock" _delta="define">
             <parent>cmdbAbstractObject</parent>
             <properties>
+                <style>
+                <icon>./images/nginx_server_block.svg</icon>
+                </style>
                 <category>bizmodel,configmgmt</category>
                 <abstract>false</abstract>
                 <key_type>autoincrement</key_type>
                 <db_table>nginxserverblock</db_table>
                 <db_key_field>id</db_key_field>
                 <db_final_class_field />
+                <naming>
+                    <attributes>
+                        <attribute id="name" />
+                    </attributes>
+                </naming>
             </properties>
             <fields>
                 <field id="instance_id" xsi:type="AttributeExternalKey">
@@ -121,7 +280,10 @@
                     <is_null_allowed>false</is_null_allowed>
                     <on_target_delete>DEL_AUTO</on_target_delete>
                 </field>
-
+                <field id="instance_id_name" xsi:type="AttributeExternalField">
+                    <extkey_attcode>instance_id</extkey_attcode>
+                    <target_attcode>name</target_attcode>
+                </field>
                 <field id="locations" xsi:type="AttributeLinkedSet">
                     <linked_class>NginxLocation</linked_class>
                     <ext_key_to_me>server_id</ext_key_to_me>
@@ -144,20 +306,31 @@
                     <default_value>false</default_value>
                 </field>
             </fields>
+            <relations>
+                <relation id="impacts">
+                    <neighbours>
+                        <neighbour id="locations">
+                            <attribute>locations</attribute>
+                            <direction>both</direction>
+                        </neighbour>
+                    </neighbours>
+                </relation>
+            </relations>
             <methods />
             <presentation>
                 <details>
                     <items>
                         <item id="name" />
+                        <item id="instance_id" />
                         <item id="listen" />
                         <item id="ssl" />
-                        <item id="instance_id" />
                         <item id="locations" />
                     </items>
                 </details>
                 <list>
                     <items>
                         <item id="name" />
+                        <item id="instance_id" />
                         <item id="listen" />
                         <item id="ssl" />
                         <item id="locations" />
@@ -171,6 +344,9 @@
         <class id="NginxLocation" _delta="define">
             <parent>cmdbAbstractObject</parent>
             <properties>
+                <style>
+                <icon>./images/nginx_location.svg</icon>
+                </style>
                 <category>bizmodel,configmgmt</category>
                 <abstract>false</abstract>
                 <key_type>autoincrement</key_type>
@@ -185,7 +361,10 @@
                     <is_null_allowed>false</is_null_allowed>
                     <on_target_delete>DEL_AUTO</on_target_delete>
                 </field>
-
+                <field id="server_id_name" xsi:type="AttributeExternalField">
+                    <extkey_attcode>server_id</extkey_attcode>
+                    <target_attcode>name</target_attcode>
+                </field>
                 <field id="uri" xsi:type="AttributeString">
                     <sql>uri</sql>
                     <is_null_allowed>false</is_null_allowed>
@@ -206,10 +385,21 @@
                 </field>
 
             </fields>
+            <relations>
+                <relation id="impacts">
+                    <neighbours>
+                        <neighbour id="proxy_pass">
+                            <attribute>proxy_pass</attribute>
+                            <direction>both</direction>
+                        </neighbour>
+                    </neighbours>
+                </relation>
+            </relations>
             <methods />
             <presentation>
                 <details>
                     <items>
+                        <item id="server_id_name" />
                         <item id="uri" />
                         <item id="server_id" />
                         <item id="proxy_pass" />
@@ -220,8 +410,9 @@
                 </details>
                 <list>
                     <items>
+                        <item id="server_id" />
                         <item id="uri" />
-                        <item id="proxy_pass_name" />
+                        <item id="proxy_pass" />
                         <item id="root" />
 
                     </items>
@@ -234,6 +425,9 @@
         <class id="NginxUpstreamServer" _delta="define">
             <parent>cmdbAbstractObject</parent>
             <properties>
+                <style>
+                <icon>./images/nginx_upstream_server.svg</icon>
+                </style>
                 <category>bizmodel,configmgmt</category>
                 <abstract>false</abstract>
                 <key_type>autoincrement</key_type>
@@ -286,6 +480,9 @@
         <class id="NginxUpstream" _delta="define">
             <parent>cmdbAbstractObject</parent>
             <properties>
+                <style>
+                <icon>./images/nginx_upstream.svg</icon>
+                </style>
                 <category>bizmodel,configmgmt</category>
                 <abstract>false</abstract>
                 <key_type>autoincrement</key_type>
@@ -315,6 +512,16 @@
                     <duplicates>false</duplicates>
                 </field>
             </fields>
+            <relations>
+                <relation id="impacts">
+                    <neighbours>
+                        <neighbour id="servers">
+                            <attribute>servers</attribute>
+                            <direction>both</direction>
+                        </neighbour>
+                    </neighbours>
+                </relation>
+            </relations>
             <methods />
             <presentation>
                 <details>
