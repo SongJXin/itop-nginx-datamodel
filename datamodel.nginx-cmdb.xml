@@ -40,7 +40,10 @@
                     </values>
                     <default_value>tcp</default_value>
                 </field>
-
+                <field id="description" xsi:type="AttributeText">
+                    <label>Description</label>
+                    <sql>description</sql>
+                </field>
             </fields>
 
             <methods />
@@ -50,6 +53,7 @@
                         <item id="software_instance_id" />
                         <item id="port_number" />
                         <item id="protocol" />
+                        <item id="description" />
                     </items>
                 </details>
                 <list>
@@ -57,6 +61,7 @@
                         <item id="software_instance_id" />
                         <item id="port_number" />
                         <item id="protocol" />
+                        <item id="description" />
                     </items>
                 </list>
             </presentation>
