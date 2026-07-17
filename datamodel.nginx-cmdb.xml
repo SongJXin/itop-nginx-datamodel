@@ -67,9 +67,6 @@
                         <attribute id="software_instance_id_name" />
                         <attribute id="port_number" />
                     </attributes>
-                    <complementary_attributes>
-                        <attribute id="organization_name" />
-                    </complementary_attributes>
                 </naming>
                 <style>
                 <icon>./images/software_port.svg</icon>
