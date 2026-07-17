@@ -3,6 +3,56 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     version="1.6">
     <classes>
+        <class id="lnkSoftwareInstanceToPort" _delta="define">
+            <parent>cmdbAbstractObject</parent>
+            <properties>
+                <category>link</category>
+                <abstract>false</abstract>
+                <key_type>autoincrement</key_type>
+                <db_table>softwareport</db_table>
+                <db_key_field>id</db_key_field>
+                <db_final_class_field />
+            </properties>
+
+            <fields>
+                <field id="softwareinstance_id" xsi:type="AttributeExternalKey">
+                    <sql>softwareinstance_id</sql>
+                    <target_class>SoftwareInstance</target_class>
+                    <is_null_allowed>false</is_null_allowed>
+                    <on_target_delete>DEL_MANUAL</on_target_delete>
+                    <tracking_level>all</tracking_level>
+                </field>
+                <field id="softwareport_id" xsi:type="AttributeExternalKey">
+                    <sql>softwareport_id</sql>
+                    <target_class>SoftwarePort</target_class>
+                    <is_null_allowed>false</is_null_allowed>
+                    <on_target_delete>DEL_MANUAL</on_target_delete>
+                    <tracking_level>all</tracking_level>
+                </field>
+                <field id="comment" xsi:type="AttributeString">
+                    <sql>comment</sql>
+                    <is_null_allowed>true</is_null_allowed>
+                </field>
+            </fields>
+            <methods />
+            <presentation>
+                <details>
+                    <items>
+                        <item id="softwareinstance_id" />
+                        <item id="softwareport_id" />
+                        <item id="comment" />
+                    </items>
+                </details>
+                <!-- link 类一般不给 list，但写上也不会错 -->
+                <list>
+                    <items>
+                        <item id="softwareinstance_id" />
+                        <item id="softwareport_id" />
+                        <item id="comment" />
+                    </items>
+                </list>
+            </presentation>
+        </class>
         <class id="SoftwarePort" _delta="define">
             <parent>cmdbAbstractObject</parent>
             <properties>
@@ -12,17 +62,37 @@
                 <db_table>softwareport</db_table>
                 <db_key_field>id</db_key_field>
                 <db_final_class_field />
+                <naming>
+                    <attributes>
+                        <attribute id="software_instance_id_name" />
+                        <attribute id="port_number" />
+                    </attributes>
+                    <complementary_attributes>
+                        <attribute id="organization_name" />
+                    </complementary_attributes>
+                </naming>
                 <style>
                 <icon>./images/software_port.svg</icon>
                 </style>
             </properties>
-
             <fields>
+                <field id="used_by_si_list" xsi:type="AttributeLinkedSetIndirect">
+                    <linked_class>lnkSoftwareInstanceToPort</linked_class>
+                    <ext_key_to_me>softwareport_id</ext_key_to_me>
+                    <ext_key_to_remote>softwareinstance_id</ext_key_to_remote>
+                    <count_min>0</count_min>
+                    <count_max>0</count_max>
+                    <edit_mode>none</edit_mode>
+                </field>
                 <field id="software_instance_id" xsi:type="AttributeExternalKey">
                     <sql>software_instance_id</sql>
                     <target_class>SoftwareInstance</target_class>
                     <label>Software Instance</label>
                     <is_null_allowed>false</is_null_allowed>
+                </field>
+                <field id="software_instance_id_name" xsi:type="AttributeExternalField">
+                    <extkey_attcode>software_instance_id</extkey_attcode>
+                    <target_attcode>name</target_attcode>
                 </field>
 
                 <field id="port_number" xsi:type="AttributeInteger">
@@ -46,7 +116,13 @@
                     <is_null_allowed>true</is_null_allowed>
                 </field>
             </fields>
-
+            <neighbours>
+                <!-- Port ← SI（反向影响） -->
+                <neighbour id="port_used_by_si">
+                    <attribute>used_by_si_list</attribute>
+                    <direction>both</direction>
+                </neighbour>
+            </neighbours>
             <methods />
             <presentation>
                 <details>
@@ -55,6 +131,7 @@
                         <item id="port_number" />
                         <item id="protocol" />
                         <item id="description" />
+                        <item id="used_by_si_list" />
                     </items>
                 </details>
                 <list>
@@ -77,12 +154,24 @@
                     <zlist>true</zlist>
                     <duplicates>false</duplicates>
                 </field>
+                <field id="linked_ports_list" xsi:type="AttributeLinkedSetIndirect" _delta="define">
+                    <linked_class>lnkSoftwareInstanceToPort</linked_class>
+                    <ext_key_to_me>softwareinstance_id</ext_key_to_me>
+                    <ext_key_to_remote>softwareport_id</ext_key_to_remote>
+                    <count_min>0</count_min>
+                    <count_max>0</count_max>
+                    <edit_mode>add_remove</edit_mode>
+                </field>
             </fields>
             <relations>
                 <relation id="impacts" _delta="merge">
                     <neighbours>
                         <neighbour id="ports">
                             <attribute>ports</attribute>
+                            <direction>both</direction>
+                        </neighbour>
+                        <neighbour id="si_uses_port">
+                            <attribute>linked_ports_list</attribute>
                             <direction>both</direction>
                         </neighbour>
                     </neighbours>
@@ -92,11 +181,13 @@
                 <details>
                     <items>
                         <item id="ports" _delta="define" />
+                        <item id="linked_ports_list" _delta="define" />
                     </items>
                 </details>
                 <list>
                     <items>
                         <item id="ports" _delta="define" />
+                        <item id="linked_ports_list" _delta="define" />
                     </items>
                 </list>
             </presentation>
@@ -106,6 +197,7 @@
                 <details>
                     <items>
                         <item id="ports" />
+                        <item id="linked_ports_list" />
                     </items>
                 </details>
             </presentation>
@@ -115,6 +207,7 @@
                 <details>
                     <items>
                         <item id="ports" />
+                        <item id="linked_ports_list" />
                     </items>
                 </details>
             </presentation>
@@ -124,6 +217,7 @@
                 <details>
                     <items>
                         <item id="ports" />
+                        <item id="linked_ports_list" />
                     </items>
                 </details>
             </presentation>
@@ -133,6 +227,7 @@
                 <details>
                     <items>
                         <item id="ports" />
+                        <item id="linked_ports_list" />
                     </items>
                 </details>
             </presentation>
@@ -142,6 +237,7 @@
                 <details>
                     <items>
                         <item id="ports" />
+                        <item id="linked_ports_list" />
                     </items>
                 </details>
             </presentation>
@@ -275,7 +371,9 @@
                 <db_final_class_field />
                 <naming>
                     <attributes>
+                        <attribute id="instance_id_name" />
                         <attribute id="name" />
+                        <attribute id="listen" />
                     </attributes>
                 </naming>
             </properties>
@@ -290,6 +388,7 @@
                     <extkey_attcode>instance_id</extkey_attcode>
                     <target_attcode>name</target_attcode>
                 </field>
+
                 <field id="locations" xsi:type="AttributeLinkedSet">
                     <linked_class>NginxLocation</linked_class>
                     <ext_key_to_me>server_id</ext_key_to_me>
@@ -359,6 +458,12 @@
                 <db_table>nginxlocation</db_table>
                 <db_key_field>id</db_key_field>
                 <db_final_class_field />
+                <naming>
+                    <attributes>
+                        <attribute id="server_id_name" />
+                        <attribute id="uri" />
+                    </attributes>
+                </naming>
             </properties>
             <fields>
                 <field id="server_id" xsi:type="AttributeExternalKey">
@@ -495,6 +600,11 @@
                 <db_table>nginxupstream</db_table>
                 <db_key_field>id</db_key_field>
                 <db_final_class_field />
+                <naming>
+                    <attributes>
+                        <attribute id="name" />
+                    </attributes>
+                </naming>
             </properties>
 
             <fields>
