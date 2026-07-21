@@ -9,7 +9,7 @@
                 <category>link</category>
                 <abstract>false</abstract>
                 <key_type>autoincrement</key_type>
-                <db_table>softwareport</db_table>
+                <db_table>lnksoftwareinstancetoport</db_table>
                 <db_key_field>id</db_key_field>
                 <db_final_class_field />
             </properties>
@@ -61,7 +61,6 @@
                 <plural>Software Ports</plural>
                 <db_table>softwareport</db_table>
                 <db_key_field>id</db_key_field>
-                <db_final_class_field />
                 <naming>
                     <attributes>
                         <attribute id="software_instance_id_name" />
@@ -73,15 +72,7 @@
                 </style>
             </properties>
             <fields>
-                <!-- <field id="depends_on_location" xsi:type="AttributeDependency">
-                    <allowed_sources>
-                        <class>NginxLocation</class>
-                    </allowed_sources>
-                    <ext_keys>
-                        <attribute>proxy_pass</attribute>
-                    </ext_keys>
-                    <edit_mode>none</edit_mode>
-                </field> -->
+
                 <field id="used_by_si_list" xsi:type="AttributeLinkedSetIndirect">
                     <linked_class>lnkSoftwareInstanceToPort</linked_class>
                     <ext_key_to_me>softwareport_id</ext_key_to_me>
@@ -340,11 +331,11 @@
                 <field id="servers" xsi:type="AttributeLinkedSet">
                     <linked_class>NginxServerBlock</linked_class>
 
-                    <ext_key_to_me>instance_id</ext_key_to_me>
+                    <ext_key_to_me>software_instance_id</ext_key_to_me>
 
 
                     <count_min>0</count_min>
-                    <count_max>0</count_max> <!-- 0 = 无限制 -->
+                    <count_max>0</count_max> 
                     <zlist>true</zlist>
                     <duplicates>false</duplicates>
                 </field>
@@ -370,6 +361,7 @@
                         <item id="config_file" />
                         <item id="software_id" />
                         <item id="system_id" />
+                        <item id="linked_ports_list" _delta="define" />
                     </items>
                 </details>
                 <list>
@@ -380,6 +372,7 @@
                         <item id="config_file" />
                         <item id="software_id" />
                         <item id="system_id" />
+                        <item id="linked_ports_list" _delta="define" />
                     </items>
                 </list>
             </presentation>
@@ -389,7 +382,7 @@
  server {}
 =========================== -->
         <class id="NginxServerBlock" _delta="define">
-            <parent>cmdbAbstractObject</parent>
+            <parent>SoftwarePort</parent>
             <properties>
                 <style>
                 <icon>./images/nginx_server_block.svg</icon>
@@ -402,23 +395,12 @@
                 <db_final_class_field />
                 <naming>
                     <attributes>
-                        <attribute id="instance_id_name" />
-                        <attribute id="name" />
-                        <attribute id="listen" />
+                        <attribute id="software_instance_id_name" />
+                        <attribute id="port_number" />
                     </attributes>
                 </naming>
             </properties>
             <fields>
-                <field id="instance_id" xsi:type="AttributeExternalKey">
-                    <sql>instance_id</sql>
-                    <target_class>NginxInstance</target_class>
-                    <is_null_allowed>false</is_null_allowed>
-                    <on_target_delete>DEL_AUTO</on_target_delete>
-                </field>
-                <field id="instance_id_name" xsi:type="AttributeExternalField">
-                    <extkey_attcode>instance_id</extkey_attcode>
-                    <target_attcode>name</target_attcode>
-                </field>
 
                 <field id="locations" xsi:type="AttributeLinkedSet">
                     <linked_class>NginxLocation</linked_class>
@@ -428,14 +410,6 @@
                     <count_max>0</count_max> <!-- 0 = 无限制 -->
                     <zlist>true</zlist>
                     <duplicates>false</duplicates>
-                </field>
-                <field id="name" xsi:type="AttributeString">
-                    <sql>name</sql>
-                    <is_null_allowed>false</is_null_allowed>
-                </field>
-                <field id="listen" xsi:type="AttributeString">
-                    <sql>listen</sql>
-                    <is_null_allowed>true</is_null_allowed>
                 </field>
                 <field id="ssl" xsi:type="AttributeBoolean">
                     <sql>ssl</sql>
@@ -456,18 +430,16 @@
             <presentation>
                 <details>
                     <items>
-                        <item id="name" />
-                        <item id="instance_id" />
-                        <item id="listen" />
+                        <item id="software_instance_id" />
+                        <item id="port_number" />
                         <item id="ssl" />
                         <item id="locations" />
                     </items>
                 </details>
                 <list>
                     <items>
-                        <item id="name" />
-                        <item id="instance_id" />
-                        <item id="listen" />
+                        <item id="software_instance_id" />
+                        <item id="port_number" />
                         <item id="ssl" />
                         <item id="locations" />
                     </items>
@@ -491,7 +463,7 @@
                 <db_final_class_field />
                 <naming>
                     <attributes>
-                        <attribute id="server_id_name" />
+                        <attribute id="server_id_port" />
                         <attribute id="uri" />
                     </attributes>
                 </naming>
@@ -503,9 +475,9 @@
                     <is_null_allowed>false</is_null_allowed>
                     <on_target_delete>DEL_AUTO</on_target_delete>
                 </field>
-                <field id="server_id_name" xsi:type="AttributeExternalField">
+                <field id="server_id_port" xsi:type="AttributeExternalField">
                     <extkey_attcode>server_id</extkey_attcode>
-                    <target_attcode>name</target_attcode>
+                    <target_attcode>port_number</target_attcode>
                 </field>
                 <field id="uri" xsi:type="AttributeString">
                     <sql>uri</sql>
@@ -537,21 +509,12 @@
                 </field>
 
             </fields>
-            <relations>
-                <relation id="impacts">
-                    <neighbours>
-                        <neighbour id="proxy_pass_upstream">
-                            <attribute>proxy_pass_upstream</attribute>
-                            <direction>both</direction>
-                        </neighbour>
-                    </neighbours>
-                </relation>
-            </relations>
+
             <methods />
             <presentation>
                 <details>
                     <items>
-                        <item id="server_id_name" />
+                        <item id="server_id_port" />
                         <item id="uri" />
                         <item id="server_id" />
                         <item id="proxy_pass" />
@@ -664,6 +627,13 @@
                     <sql>algorithm</sql>
                     <is_null_allowed>true</is_null_allowed>
                 </field>
+                <field id="used_by_lc_list" xsi:type="AttributeLinkedSet">
+                    <linked_class>NginxLocation</linked_class>
+                    <ext_key_to_me>proxy_pass_upstream</ext_key_to_me>
+                    <count_min>0</count_min>
+                    <count_max>0</count_max>
+                    <edit_mode>none</edit_mode>
+                </field>
                 <field id="servers" xsi:type="AttributeLinkedSetIndirect">
                     <linked_class>NginxUpstreamServer</linked_class>
                     <ext_key_to_me>upstream_id</ext_key_to_me>
@@ -676,6 +646,16 @@
                     <duplicates>false</duplicates>
                 </field>
             </fields>
+            <relations>
+                <relation id="impacts">
+                    <neighbours>
+                        <neighbour id="used_by_lc_list">
+                            <attribute>used_by_lc_list</attribute>
+                            <direction>both</direction>
+                        </neighbour>
+                    </neighbours>
+                </relation>
+            </relations>
             <methods />
             <presentation>
                 <details>
@@ -683,6 +663,7 @@
                         <item id="name" />
                         <item id="algorithm" />
                         <item id="servers" />
+                        <item id="used_by_lc_list" />
                     </items>
                 </details>
                 <list>

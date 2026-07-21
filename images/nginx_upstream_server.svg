@@ -1,13 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-  <defs>
-    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1E88E5" />
-      <stop offset="100%" stop-color="#0D47A1" />
-    </linearGradient>
-  </defs>
-  <rect x="18" y="34" width="28" height="18" rx="4" fill="url(#blueGrad)" />
-  <rect x="22" y="38" width="8" height="6" rx="2" fill="#fff" opacity="0.85" />
-  <rect x="34" y="38" width="8" height="6" rx="2" fill="#fff" opacity="0.85" />
-  <path d="M32 14v16" stroke="url(#blueGrad)" stroke-width="3" />
-  <path d="M26 22l6-6 6 6" fill="url(#blueGrad)" />
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="74" viewBox="0 0 64 74" fill="none">
+  <rect x="18" y="36" width="28" height="16" rx="3" stroke="#1976D2" stroke-width="2"/>
+  <line x1="22" y1="42" x2="28" y2="42" stroke="#1976D2" stroke-width="2"/>
+  <line x1="36" y1="42" x2="42" y2="42" stroke="#1976D2" stroke-width="2"/>
+  <line x1="32" y1="14" x2="32" y2="28" stroke="#1976D2" stroke-width="2"/>
+  <path stroke="#1976D2" stroke-width="2" d="M26 22l6-6 6 6" fill="none"/>
+  <text x="32" y="70" font-family="Arial, sans-serif" font-size="9" fill="#1976D2" text-anchor="middle">NginxUpstreamServer</text>
 </svg>
